@@ -12,7 +12,7 @@ function App() {
   return (
     <div>
       <div>
-        <h2>Button</h2>
+        <h2 className="bg-red-600">Button</h2>
         <p>{adicioinar}</p>
         <Button onClick={handleAdd} >Incrementar</Button>
       </div>
