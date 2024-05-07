@@ -1,88 +1,62 @@
 import { useEffect, useState } from "react"
-import { Button, ButtonI } from "./components/Button"
-import { Input } from "./components/Input"
+
 import './index.css'
+import { Input } from "./components/Input"
 
-
-type User = {
-  nome: string
-  profissão: string
+type Venda = {
+  id: string;
+  nome: string;
+  preco: number;
+  status: string;
 }
 
 
 function App() {
-  const [adicioinar, setAdicionar] = useState(0);
-  const [data, setData] = useState<null | User>(null)
-  const [ total , setTotal ] = useState(0)
+  const [ inicio, setInicio ] = useState('');
+  const [ final, setFinal ] = useState('');
+  const [ data, setData ] = useState<null | Venda[]>(null)
 
-  function user() {
-    return {
-      nome: "Aldinei",
-      profissão: "Dev"
-    }
-  }
 
   useEffect(() => {
-    setTimeout(() => {
-      setData(user())
-    }, 1000)
-  }, [])
+    if(inicio !== '' && final !== '') {
+      fetch(`https://data.origamid.dev/vendas/?inicio=${inicio}&final=${final}`)
+      .then(response => response.json())
+      .then(json => setData(json as Venda[]))
+      .catch(error => console.log(error))
+    }
+  }, [inicio, final]);
 
-
-  function handleAdd() {
-    setAdicionar((total) => total + 1)
-  }
 
   return (
     <div>
       <div>
-        Total : {total}
-        <ButtonI incrementar={setTotal}/>
+        <Input label="Início" type="date" value={inicio} setState={setInicio} />
+        <Input label="Final" type="date" value={final} setState={setFinal} />
       </div>
-      <div>
-        {data !== null && <div>{data.nome} - {data.profissão}</div>}
-      </div>
-      <div>
-        <h2 className="text-red-600">Button</h2>
-        <p>{adicioinar}</p>
-        <Button onClick={handleAdd} >Incrementar</Button>
-      </div>
-
-      <hr />
 
       <div>
-
-        <h2>Input</h2>
-        <Input
-          label="Nome: "
-          id="name"
-        />
-
-        <Input
-          label="E-mail: "
-          id="input"
-        />
-
-        <Input
-          label="De: "
-          id="data_inicio"
-          type="date"
-        />
-
-        <Input
-          label="Até: "
-          id="data_fim"
-          type="date"
-        />
-
-        <Input
-          label="Hora Viagem: "
-          id="Hora"
-          type="time"
-        />
-
-
+        <p>De: {inicio}</p>
+        <p>Até: {final}</p>
       </div>
+
+      <p>Total de Vendas: {data?.length}</p>
+      <table>
+        <thead>
+          <tr>
+            <th style={{ width: '200px' }}>Venda</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {data && data.map((d) => (
+            <tr key={d.id}>
+              <td style={{ width: '200px' }}>{d.nome}</td>
+              <td>{d.status}</td>
+            </tr>
+        ))}
+          
+        </tbody>
+      </table>
     </div>
   )
 }
