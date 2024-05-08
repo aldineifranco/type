@@ -1,70 +1,53 @@
-import { useState } from "react"
-import { Button } from "./components/Button"
+import { useEffect, useState } from "react"
 import { Input } from "./components/Input"
-import { Checkbox } from "./components/Checkbox"
+
+type VendasProps = {
+  id: number;
+  nome: string;
+  status: string;
+}
 
 function App() {
-  const [adicioinar, setAdicionar] = useState(0)
+  const [inicio, setInicio] = useState('');
+  const [fim, setFim] = useState('');
+  const [data, setData] = useState<VendasProps[]>([]);
 
-  function handleAdd() {
-    setAdicionar((total) => total + 1)
-  }
+  useEffect(() => {
+    fetch(`https://data.origamid.dev/vendas/?inicio=${inicio}&final=${fim}`)
+      .then((response) => response.json())
+      .then((json) => setData(json))
+  }, [inicio, fim])
 
   return (
-    <div className="flex flex-col gap-5">
-      <div>
-        <h2 className="font-bold text-lg mb-4">Button</h2>
-        <p>{adicioinar}</p>
-        <Button onClick={handleAdd} >Incrementar</Button>
-      </div>
+    <div>
 
-      <hr />
+      <Input
+        label="Data Inicial: "
+        id="hora_inicial"
+        type="date"
+        value={inicio}
+        onChange={({ currentTarget }) => setInicio(currentTarget.value)}
+      />
 
-      <div>
-
-        <h2 className="font-bold text-lg mb-4">Input</h2>
-        <Input
-          label="Nome: "
-          id="name"
-        />
-
-        <Input
-          label="E-mail: "
-          id="input"
-        />
-
-        <Input
-          label="De: "
-          id="data_inicio"
-          type="date"
-        />
-
-        <Input
-          label="Até: "
-          id="data_fim"
-          type="date"
-        />
-
-        <Input
-          label="Hora Viagem: "
-          id="Hora"
-          type="time"
-        />
-
-
-      </div>
-
-      <hr />
+      <Input
+        label="Data Final: "
+        id="hora_inicial"
+        type="date"
+        value={fim}
+        onChange={({ currentTarget }) => setFim(currentTarget.value)}
+      />
 
       <div>
-        <h2 className="font-bold text-lg mb-4">Checkbox</h2>
-        <span className="shadow-xl p-3">
-          <Checkbox label=" Termos e Condições" />
-        </span>
-        
+        <p className="font-bold mb-4">Total de vendas: {data.length}</p>
+
+        {data && data.map((venda) => (
+          <div key={venda.id}>
+            <p>{venda.nome} - {venda.status}</p>
+          </div>
+        ))}
       </div>
 
-
+  
     </div>
   )
 }
