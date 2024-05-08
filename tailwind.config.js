@@ -1,9 +1,13 @@
+<<<<<<< HEAD
 /** @type {import('tailwindcss').Config} */
+=======
+>>>>>>> 05c9ca6e3de73d34424757d45b13bac741de67d5
 export default {
   content: [
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
+<<<<<<< HEAD
   darkMode: "media", // or 'class'
   theme: {
     accentColor: ({ theme }) => ({
@@ -1129,4 +1133,10 @@ export default {
   },
   plugins: [],
   presets: [],
+=======
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+>>>>>>> 05c9ca6e3de73d34424757d45b13bac741de67d5
 };
