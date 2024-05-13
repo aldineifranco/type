@@ -1,60 +1,93 @@
-import { useEffect, useState } from "react"
-
+import { useEffect, useState } from 'react'
+import { Input } from './components/Input'
 import './index.css'
-import { Input } from "./components/Input"
 
-type Venda = {
+type Vendas = {
   id: string;
-  nome: string;
-  preco: number;
-  status: string;
+  nome?: string;
+  preco?: string;
+  status?: string;
 }
 
 
 function App() {
-  const [ inicio, setInicio ] = useState('');
-  const [ final, setFinal ] = useState('');
-  const [ data, setData ] = useState<null | Venda[]>(null)
-
+  const [inicio, setInicio] = useState('')
+  const [fim, setFim] = useState(new Date().toISOString().slice(0, 10))
+  const [checked, setChecked] = useState<string[]>([])
+  const [data, setData] = useState<null | Vendas[]>(null)
 
   useEffect(() => {
-    if(inicio !== '' && final !== '') {
-      fetch(`https://data.origamid.dev/vendas/?inicio=${inicio}&final=${final}`)
-      .then(response => response.json())
-      .then(json => setData(json as Venda[]))
-      .catch(error => console.log(error))
+    if (inicio !== '' && fim !== '') {
+      fetch(`https://data.origamid.dev/vendas/?inicio=${inicio}&final=${fim}`)
+        .then(response => response.json())
+        .then((json: Vendas[]) => {
+          if (checked.length > 0) {
+            const filteredData = json.filter(item => checked.includes(item.status as string))
+            setData(filteredData)
+          } else {
+            setData(json)
+          }
+        })
     }
-  }, [inicio, final]);
+  }, [inicio, fim, checked])
 
+  function toggleCheckbox(value: string) {
+    if (checked.includes(value)) {
+      setChecked(checked.filter(item => item !== value))
+    } else {
+      setChecked([...checked, value])
+    }
+  }
 
   return (
     <div>
-      <div>
-        <Input label="Início" type="date" value={inicio} setState={setInicio} />
-        <Input label="Final" type="date" value={final} setState={setFinal} />
+      <div className=''>
+        <Input type='date' label='De: ' id='data-inicio' value={inicio} setState={setInicio} />
+        <Input type='date' label='De: ' id='data-inicio' value={fim} setState={setFim} />
       </div>
 
       <div>
-        <p>De: {inicio}</p>
-        <p>Até: {final}</p>
+        <label htmlFor='processando'>
+          <input
+            type="checkbox"
+            id="processando"
+            value={checked}
+            checked={checked?.includes('processando')}
+            onChange={() => toggleCheckbox('processando')}
+          />
+          Processando
+        </label>
+
+        <label htmlFor='pago'>
+          <input
+            type="checkbox"
+            id="pago"
+            value={'pago'}
+            checked={checked?.includes('pago')}
+            onChange={() => toggleCheckbox('pago')}
+          />
+          Pago
+        </label>
       </div>
 
-      <p>Total de Vendas: {data?.length}</p>
-      <table>
+      <div>
+        Quantidade: {data?.length}
+      </div>
+
+      <table className='table-fixe border-spacing-2 border border-slate-500'>
         <thead>
           <tr>
-            <th style={{ width: '200px' }}>Venda</th>
-            <th>Status</th>
+            <th className='border border-slate-600 text-left w-[150px] bg-gray-100'>Vendas</th>
+            <th className='border border-slate-600 text-left w-[150px] bg-gray-100'>Status</th>
           </tr>
         </thead>
         <tbody>
-          {data && data.map((d) => (
-            <tr key={d.id}>
-              <td style={{ width: '200px' }}>{d.nome}</td>
-              <td>{d.status}</td>
+          {data && data.map((x) => (
+            <tr key={x.id}>
+              <td className="border border-slate-700">{x.nome}</td>
+              <td className="border border-slate-700">{x.status}</td>
             </tr>
-        ))}
-          
+          ))}
         </tbody>
       </table>
     </div>
